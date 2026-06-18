@@ -10,7 +10,7 @@ st.set_page_config(page_title="PDF Asistanım", layout="wide", page_icon="📄")
 st.markdown("""
     <style>
     /* Uygulama genel metinleri temadan renk alır */
-    .stApp, .stMarkdown, .stInfo, .stExpander, .stCaption, p, h1, h2, h3 {
+    .stApp, .stMarkdown, .stInfo, .stExpander, .stCaption, p, h1, h2, h3, div {
         color: var(--text-color) !important;
     }
     
@@ -21,7 +21,6 @@ st.markdown("""
         border-radius: 20px !important; 
         background-color: var(--background-color) !important; 
         color: var(--text-color) !important; 
-        /* Kenarlığı temanın yazı renginde yaparak her modda görünür kıldık */
         border: 3px solid var(--text-color) !important; 
         box-shadow: 0 4px 10px rgba(128,128,128,0.2) !important;
         font-weight: bold;
@@ -84,6 +83,7 @@ if 'page' not in st.session_state: st.session_state.page = 'home'
 with st.sidebar:
     st.title("📄 PDF Asistanım")
     st.metric(label="🚀 Toplam İşlenen PDF", value="1.240+")
+    st.info("🔒 **Güvenlik:** Dosyalarınız sunucuda tutulmaz; işlem bitince silinir.")
     st.write("---")
     if st.session_state.page != 'home':
         if st.button("🏠 Ana Menüye Dön"): st.session_state.page = 'home'; st.rerun()
@@ -102,12 +102,15 @@ if st.session_state.page == 'home':
         st.caption("PDF dosyalarınızı tek dosyada birleştirin.")
         if st.button("🗑️ SAYFA SİL"): st.session_state.page = 'Sayfa Sil'; st.rerun()
         st.caption("İstediğiniz sayfaları PDF'den çıkarın.")
+    
+    st.markdown("---")
+    st.warning("⚠️ **Gizlilik:** İşlem yaptığınız PDF'ler sunucuda saklanmaz.")
 else:
     st.header(f"Araç: {st.session_state.page}")
     st.write("---")
     
     with st.expander("📖 Nasıl Kullanılır?"):
-        st.write("1. Dosyanızı yükleyin.\n2. Gerekli ayarları seçin.\n3. '🚀 İşlemi Başlat' butonuna basın.")
+        st.write("1. Dosyanızı yükleyin.\n2. Ayarları seçin.\n3. '🚀 İşlemi Başlat' butonuna basın.\n\n🛡️ **Gizlilik:** Dosyalarınız geçici bellekte işlenir ve oturum kapandığında sunucudan silinir.")
 
     dosya = st.file_uploader("PDF dosyanızı yükleyin", type="pdf", accept_multiple_files=(st.session_state.page == "Birleştir"))
     
