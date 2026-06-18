@@ -6,27 +6,16 @@ import zipfile
 # --- 1. AYARLAR ---
 st.set_page_config(page_title="PDF Asistanım", layout="wide", page_icon="📄")
 
-# CSS: Hem aydınlık hem karanlık modda okunabilir olması için sidebar rengini sabitledik
 st.markdown("""
     <style>
-    /* Sidebar'ı sabit bir tonda sabitleyerek renk çakışmasını engelledik */
-    [data-testid="stSidebar"] {
-        background-color: #f1f5f9 !important;
-    }
-    [data-testid="stSidebar"] * {
-        color: #1e293b !important;
-    }
+    [data-testid="stSidebar"] { background-color: #f1f5f9 !important; }
+    [data-testid="stSidebar"] * { color: #1e293b !important; }
     .stApp { background-color: #f8fafc; }
     .stButton>button {
-        height: 160px !important; 
-        width: 100% !important; 
-        border-radius: 20px !important; 
-        font-size: 20px !important; 
-        font-weight: bold !important;
-        background-color: #ffffff !important; 
-        color: #1e293b !important; 
-        border: 2px solid #e2e8f0 !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        height: 160px !important; width: 100% !important; border-radius: 20px !important; 
+        font-size: 20px !important; font-weight: bold !important;
+        background-color: #ffffff !important; color: #1e293b !important; 
+        border: 2px solid #e2e8f0 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
     .stButton>button:hover { border-color: #3b82f6 !important; color: #3b82f6 !important; }
     h1, h2, h3 { color: #1e293b !important; }
@@ -83,18 +72,40 @@ if st.session_state.page == 'home':
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✂️ PDF BÖL"): st.session_state.page = 'Böl'; st.rerun()
+        st.caption("PDF dosyanızı sayfalara ayırın veya spesifik bir sayfayı çekin.")
         if st.button("🔄 DÖNDÜR"): st.session_state.page = 'Döndür'; st.rerun()
+        st.caption("Yanlış taranmış PDF sayfalarınızı kolayca çevirin.")
     with col2:
         if st.button("🔗 BİRLEŞTİR"): st.session_state.page = 'Birleştir'; st.rerun()
+        st.caption("Birden fazla PDF dosyasını tek bir dosyada birleştirin.")
         if st.button("🗑️ SAYFA SİL"): st.session_state.page = 'Sayfa Sil'; st.rerun()
+        st.caption("İstemediğiniz sayfaları PDF'den kalıcı olarak çıkarın.")
 else:
     st.header(f"Araç: {st.session_state.page}")
+    
+    # Dinamik Açıklama
+    aciklamalar = {
+        "Böl": "Bu araç PDF'inizi sayfalara ayırır. Bir sayfa numarası girerseniz o sayfayı, boş bırakırsanız tüm sayfaları ayrı ayrı (ZIP olarak) indirirsiniz.",
+        "Döndür": "Tüm sayfaları seçtiğiniz açıda (90°, 180°, 270°) döndürür ve yeni PDF dosyasını sunar.",
+        "Birleştir": "Yüklediğiniz tüm PDF dosyalarını sıralı bir şekilde tek bir dosya haline getirir.",
+        "Sayfa Sil": "Belirttiğiniz sayfa numarasını PDF'ten çıkarır ve kalan sayfaları tek PDF olarak sunar."
+    }
+    st.info(f"💡 **Nasıl Çalışır:** {aciklamalar.get(st.session_state.page, 'İşleminizi seçin.')}")
+
+    with st.expander("📖 Adım Adım Talimatlar"):
+        st.write("""
+        1. Dosyanızı yükleyin.
+        2. Gerekli ayarları (sayfa no veya açı) seçin.
+        3. '🚀 İşlemi Başlat' butonuna basın.
+        4. İşlem bitince çıkan butondan dosyanızı indirin.
+        *Güvenlik Notu: Dosyalarınız sunucuda saklanmaz, işlem bitince otomatik silinir.*
+        """)
+
     dosya = st.file_uploader("PDF dosyanızı yükleyin", type="pdf", accept_multiple_files=(st.session_state.page == "Birleştir"))
     
     if dosya:
         if st.session_state.page != "Birleştir": pdf_onizle(dosya)
-        
-        parametre = st.text_input("Sayfa No (Bölme için boş bırakın):") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
+        parametre = st.text_input("Sayfa No:") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
         aci = st.selectbox("Açı:", [90, 180, 270, 360]) if st.session_state.page == "Döndür" else 90
         
         if st.button("🚀 İşlemi Başlat"):
@@ -107,6 +118,6 @@ else:
                 
                 st.success("İşlem Başarılı!")
                 c1, c2 = st.columns(2)
-                with c1: st.download_button("📥 Dosyayı İndir", sonuc, f"islem_sonucu.{tur}")
+                with c1: st.download_button("📥 İndir", sonuc, f"sonuc.{tur}")
                 with c2: 
-                    if st.button("🔄 Yeni İşlem Yap"): st.session_state.page = 'home'; st.rerun()
+                    if st.button("🔄 Yeni İşlem"): st.session_state.page = 'home'; st.rerun()
