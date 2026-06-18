@@ -6,9 +6,17 @@ import zipfile
 # --- 1. AYARLAR ---
 st.set_page_config(page_title="PDF Asistanım", layout="wide", page_icon="📄")
 
+# CSS: Hem aydınlık hem karanlık modda okunabilir olması için sidebar rengini sabitledik
 st.markdown("""
     <style>
-    .stApp { background-color: #f1f5f9; }
+    /* Sidebar'ı sabit bir tonda sabitleyerek renk çakışmasını engelledik */
+    [data-testid="stSidebar"] {
+        background-color: #f1f5f9 !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: #1e293b !important;
+    }
+    .stApp { background-color: #f8fafc; }
     .stButton>button {
         height: 160px !important; 
         width: 100% !important; 
@@ -71,7 +79,7 @@ with st.sidebar:
 
 if st.session_state.page == 'home':
     st.title("📄 PDF Asistanım")
-    st.subheader("Hızlı, Güvenli ve Profesyonel")
+    st.subheader("Hızlı, Güvenli ve Profesyonel PDF Araçları")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✂️ PDF BÖL"): st.session_state.page = 'Böl'; st.rerun()
@@ -81,11 +89,14 @@ if st.session_state.page == 'home':
         if st.button("🗑️ SAYFA SİL"): st.session_state.page = 'Sayfa Sil'; st.rerun()
 else:
     st.header(f"Araç: {st.session_state.page}")
-    dosya = st.file_uploader("Dosya seçin", type="pdf", accept_multiple_files=(st.session_state.page == "Birleştir"))
+    dosya = st.file_uploader("PDF dosyanızı yükleyin", type="pdf", accept_multiple_files=(st.session_state.page == "Birleştir"))
+    
     if dosya:
         if st.session_state.page != "Birleştir": pdf_onizle(dosya)
-        parametre = st.text_input("Sayfa No:") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
+        
+        parametre = st.text_input("Sayfa No (Bölme için boş bırakın):") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
         aci = st.selectbox("Açı:", [90, 180, 270, 360]) if st.session_state.page == "Döndür" else 90
+        
         if st.button("🚀 İşlemi Başlat"):
             with st.spinner("İşleniyor..."):
                 if st.session_state.page == "Birleştir":
@@ -93,8 +104,9 @@ else:
                     for d in dosya: yazici.insert_pdf(fitz.open(stream=d.read(), filetype="pdf"))
                     sonuc = io.BytesIO(); yazici.save(sonuc); sonuc = sonuc.getvalue(); tur = "pdf"
                 else: sonuc, tur = islem_yap(dosya, st.session_state.page, parametre, aci)
+                
                 st.success("İşlem Başarılı!")
                 c1, c2 = st.columns(2)
-                with c1: st.download_button("📥 İndir", sonuc, f"islem.{tur}")
+                with c1: st.download_button("📥 Dosyayı İndir", sonuc, f"islem_sonucu.{tur}")
                 with c2: 
-                    if st.button("🔄 Yeni İşlem"): st.session_state.page = 'home'; st.rerun()
+                    if st.button("🔄 Yeni İşlem Yap"): st.session_state.page = 'home'; st.rerun()
