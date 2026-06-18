@@ -6,39 +6,57 @@ import zipfile
 # --- 1. AYARLAR ---
 st.set_page_config(page_title="PDF Asistanım", layout="wide", page_icon="📄")
 
-# TEMA DUYARLI VE BELİRGİN TASARIMLI CSS
+# KESİN ÇÖZÜM: NEON KART TASARIMI
 st.markdown("""
     <style>
-    /* Uygulama genel metinleri temadan renk alır */
-    .stApp, .stMarkdown, .stInfo, .stExpander, .stCaption, p, h1, h2, h3, div {
+    /* Genel uygulama metin rengi */
+    .stApp, p, h1, h2, h3, .stCaption {
         color: var(--text-color) !important;
     }
-    
-    /* Butonları belirgin kartlara dönüştürüyoruz */
-    .stButton>button {
-        height: 160px !important; 
-        width: 100% !important; 
-        border-radius: 20px !important; 
-        background-color: var(--background-color) !important; 
-        color: var(--text-color) !important; 
-        border: 3px solid var(--text-color) !important; 
-        box-shadow: 0 4px 10px rgba(128,128,128,0.2) !important;
-        font-weight: bold;
-        transition: 0.3s;
+
+    /* BUTON KAPSAYICISINI (KUTUYU) HEDEF ALIYORUZ */
+    div.stButton {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    /* Butonun kendisini gerçek bir NEON kutuya çeviriyoruz */
+    div.stButton > button {
+        background-color: #1a1c24 !important; /* Koyu, şık bir buton arka planı */
+        color: #00f3ff !important;           /* Neon Turkuaz metin rengi */
+        border: 2px solid #00f3ff !important; /* Neon Turkuaz çerçeve */
+        border-radius: 15px !important;
+        height: 150px !important;
+        width: 100% !important;
+        font-weight: bold !important;
+        font-size: 20px !important;
+        /* Neon Parlama Efekti */
+        box-shadow: 0 0 10px #00f3ff, inset 0 0 5px #00f3ff !important;
+        transition: all 0.3s ease-in-out !important;
+        display: block !important;
+    }
+
+    /* Üzerine gelince parlama artar ve renk dolar */
+    div.stButton > button:hover {
+        background-color: #00f3ff !important;
+        color: #000000 !important;           /* Yazı siyah olur */
+        box-shadow: 0 0 30px #00f3ff !important;
+        transform: translateY(-5px) !important;
+    }
+
+    /* Sidebar düzenlemesi */
+    [data-testid="stSidebar"] {
+        background-color: var(--secondary-background-color) !important;
+        border-right: 1px solid #00f3ff;
     }
     
-    /* Buton üzerine gelince etkileşim */
-    .stButton>button:hover {
-        border-color: var(--primary-color) !important;
-        color: var(--primary-color) !important;
-    }
-    
-    /* Sidebar arka planı ve metin rengi */
-    [data-testid="stSidebar"] { 
-        background-color: var(--secondary-background-color) !important; 
-    }
-    [data-testid="stSidebar"] * { 
-        color: var(--text-color) !important; 
+    /* Alt bilgilendirme çubuğu */
+    .footer-note {
+        padding: 10px;
+        border-radius: 10px;
+        background-color: rgba(0, 243, 255, 0.1);
+        border: 1px solid #00f3ff;
+        text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -83,14 +101,17 @@ if 'page' not in st.session_state: st.session_state.page = 'home'
 with st.sidebar:
     st.title("📄 PDF Asistanım")
     st.metric(label="🚀 Toplam İşlenen PDF", value="1.240+")
-    st.info("🔒 **Güvenlik:** Dosyalarınız sunucuda tutulmaz; işlem bitince silinir.")
+    st.info("🔒 **Güvenlik Hatırlatması:** Yüklediğiniz dosyalar sunucuda **kayıt altına alınmaz.** İşlem bittiğinde dosyalar geçici bellekten tamamen silinir.")
     st.write("---")
     if st.session_state.page != 'home':
-        if st.button("🏠 Ana Menüye Dön"): st.session_state.page = 'home'; st.rerun()
+        if st.button("🏠 Ana Menüye Dön"): 
+            st.session_state.page = 'home'
+            st.rerun()
 
 if st.session_state.page == 'home':
     st.title("📄 PDF Asistanım")
     st.subheader("Hızlı, Güvenli ve Profesyonel PDF Araçları")
+    
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✂️ PDF BÖL"): st.session_state.page = 'Böl'; st.rerun()
@@ -103,29 +124,31 @@ if st.session_state.page == 'home':
         if st.button("🗑️ SAYFA SİL"): st.session_state.page = 'Sayfa Sil'; st.rerun()
         st.caption("İstediğiniz sayfaları PDF'den çıkarın.")
     
-    st.markdown("---")
-    st.warning("⚠️ **Gizlilik:** İşlem yaptığınız PDF'ler sunucuda saklanmaz.")
+    st.write("")
+    st.markdown('<div class="footer-note">🛡️ <b>Gizlilik Notu:</b> İşlem yaptığınız PDF dosyaları sunucuda saklanmaz ve kimseyle paylaşılmaz.</div>', unsafe_allow_html=True)
+
 else:
     st.header(f"Araç: {st.session_state.page}")
     st.write("---")
     
-    with st.expander("📖 Nasıl Kullanılır?"):
-        st.write("1. Dosyanızı yükleyin.\n2. Ayarları seçin.\n3. '🚀 İşlemi Başlat' butonuna basın.\n\n🛡️ **Gizlilik:** Dosyalarınız geçici bellekte işlenir ve oturum kapandığında sunucudan silinir.")
+    with st.expander("📖 Bilgilendirme ve Güvenlik"):
+        st.write("1. Dosyanızı yükleyin.\n2. Gerekli ayarları seçin.\n3. '🚀 İşlemi Başlat' butonuna basın.")
+        st.warning("🛡️ **Önemli:** Verileriniz geçici bellekte işlenir. Sayfayı yenilediğinizde veya oturum bittiğinde her şey silinir.")
 
     dosya = st.file_uploader("PDF dosyanızı yükleyin", type="pdf", accept_multiple_files=(st.session_state.page == "Birleştir"))
     
     if dosya:
         if st.session_state.page != "Birleştir": pdf_onizle(dosya)
-        parametre = st.text_input("Sayfa No:") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
-        aci = st.selectbox("Açı:", [90, 180, 270, 360]) if st.session_state.page == "Döndür" else 90
+        parametre = st.text_input("İşlem yapılacak sayfa numarası:") if st.session_state.page in ["Böl", "Sayfa Sil"] else None
+        aci = st.selectbox("Döndürme Açısı Seçin:", [90, 180, 270, 360]) if st.session_state.page == "Döndür" else 90
         
         if st.button("🚀 İşlemi Başlat"):
-            with st.spinner("İşleniyor..."):
+            with st.spinner("Dosyanız işleniyor..."):
                 if st.session_state.page == "Birleştir":
                     yazici = fitz.open()
                     for d in dosya: yazici.insert_pdf(fitz.open(stream=d.read(), filetype="pdf"))
                     sonuc = io.BytesIO(); yazici.save(sonuc); sonuc = sonuc.getvalue(); tur = "pdf"
                 else: sonuc, tur = islem_yap(dosya, st.session_state.page, parametre, aci)
                 
-                st.success("İşlem Başarılı!")
-                st.download_button("📥 Dosyayı İndir", sonuc, f"sonuc.{tur}")
+                st.success("İşlem Başarıyla Tamamlandı!")
+                st.download_button("📥 İşlenmiş Dosyayı İndir", sonuc, f"asistan_sonuc.{tur}")
