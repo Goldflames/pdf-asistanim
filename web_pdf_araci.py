@@ -109,7 +109,7 @@ with st.sidebar:
 
 if st.session_state.page == 'home':
     st.title("📄 PDF Asistanım")
-    st.subheader("Hızlı, Güvenli ve Profesyonel PDF Araçları")
+    st.subheader("Dijital Belgeleriniz İçin Pratik İsviçre Çakısı")
     col1, col2 = st.columns(2)
     with col1:
         if st.button("✂️ PDF BÖL"): st.session_state.page = 'Böl'; st.rerun()
