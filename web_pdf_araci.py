@@ -9,6 +9,7 @@ st.set_page_config(page_title="PDF Asistanım", layout="wide", page_icon="📄")
 
 st.markdown("""
     <style>
+    /* ANA BUTONLAR: Sabit genişlik ve hizalama */
     div.stButton > button {
         width: 100% !important; min-width: 300px !important; height: 80px !important;
         border-radius: 15px !important; background-color: #1a1c24 !important;
@@ -55,8 +56,7 @@ def pdf_duzelt(dosya):
     doc = fitz.open(stream=dosya.read(), filetype="pdf")
     progress_bar = st.progress(0)
     for i, page in enumerate(doc):
-        # 'derotation' hatasını gidermek için doğrudan 0 rotasyonuna ayarlıyoruz
-        page.set_rotation(0)
+        page.set_rotation(0) # Rotasyonu sıfırlayarak düzeltme
         progress_bar.progress((i + 1) / len(doc))
     cikti = io.BytesIO()
     doc.save(cikti)
@@ -134,8 +134,6 @@ elif st.session_state.page == 'Birleştir':
             if st.button("🚀 Birleştir ve İndir"):
                 sonuc = pdf_birlestir(yuklenen_dosyalar)
                 st.success("PDF'ler birleştirildi!"); st.download_button("📥 İndir", sonuc, "birlesmis_dosya.pdf")
-    else:
-        st.info("Lütfen birleştirmek istediğiniz dosyaları seçin.")
 
 elif st.session_state.page == 'Düzelt':
     st.header("🪄 Akıllı PDF Düzeltme")
@@ -146,9 +144,11 @@ elif st.session_state.page == 'Düzelt':
 
 elif st.session_state.page == 'JPG-PDF':
     st.header("🖼️ JPG'den A4 PDF'e")
-    i1 = st.file_uploader("Görseli Yükleyin:", type=['jpg', 'jpeg', 'png'])
+    mod = st.radio("Seçim:", ["Tekli Görsel", "Kimlik (Ön/Arka)"])
+    i1 = st.file_uploader("Ön Yüz / Görsel:", type=['jpg', 'jpeg', 'png'])
+    i2 = st.file_uploader("Arka Yüz:", type=['jpg', 'jpeg', 'png']) if mod == "Kimlik (Ön/Arka)" else None
     if i1 and st.button("🚀 PDF'e Dönüştür"):
-        sonuc = jpg_to_a4_pdf(i1)
+        sonuc = jpg_to_a4_pdf(i1, i2)
         st.success("Hazır!"); st.download_button("📥 İndir", sonuc, "belge_cikti.pdf")
 
 else:
